@@ -1,5 +1,29 @@
-"""Database initialization and session management."""
+from collections.abc import AsyncGenerator
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+    create_async_engine,
+    async_sessionmaker
+)
 
+from app.core.config import settings
 
-def init_db():
-    pass
+# engine : database communication manager
+engine = create_async_engine(
+    settings.DATABASE_URL,
+    echo=settings.DEBUG,
+    pool_pre_ping=True
+)
+
+AsyncSessionLocal = async_sessionmaker(
+    bind=engine,
+    class_ = AsyncSession,
+    expire_on_commit=False
+)
+
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    """
+    Provide a database session for each request.
+    """
+
+    async with AsyncSessionLocal() as session:
+        yield session

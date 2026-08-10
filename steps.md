@@ -20,3 +20,130 @@ pip freeze > requirements.txt
         - pip install loguru
         - use for request log, error log and file logging
         - ceate app/logs/ to save all logs files
+
+# Data Base
+- install packages: pip install sqlalchemy asyncpg alembic
+- app/
+    - └── db/
+        - ├── base.py
+        - ├── database.py
+        - ├── models/
+        - └── migrations/
+    - create base file
+    - crete model
+
+- psql --version
+- DATABASE_URL=postgresql+asyncpg://postgres:YOUR_POSTGRES_PASSWORD@localhost:5432/workflow_db
+- pip install sqlalchemy asyncpg alembic
+- app/models/user.py
+- check all version:
+    - pip show sqlalchemy
+    - pip show asyncpg
+    - pip show alembic
+- pip install "psycopg[binary]"
+- pip install sqlalchemy asyncpg alembic
+- for now use : https://console.neon.tech/app/org-still-grass-48589901/projects
+- Databse: workflow-management
+-           FastAPI
+                ↓
+        SQLAlchemy Async
+                ↓
+            asyncpg
+                ↓
+        ☁️ Neon PostgreSQL
+
+- run : alembic init app/db/migrations
+- alembic.ini
+
+
+
+
+
+
+
+Phase 1
+
+✅ Project setup
+✅ Virtual environment
+✅ Folder structure
+✅ Configuration
+✅ Logging
+✅ Environment variables
+
+Phase 2
+
+✅ PostgreSQL
+✅ SQLAlchemy
+✅ Alembic
+✅ Database connection
+
+    Step 1: 
+        Database Setup
+        PostgreSQL install (agar already nahi hai)
+        workflow_db database create karna
+    Step 2: 
+        SQLAlchemy Configuration
+        db/database.py
+        Async Engine
+        Session
+        Base Model
+    Step 3: 
+        First Model
+        User model
+        Relationships ka introduction
+    Step 4: 
+        Alembic
+        Migration setup
+        First migration
+        Create tables
+
+    ├── db/
+    │   ├── database.py
+    │   ├── base.py
+    │   ├── session.py
+    │   ├── models/
+    │   │     └── user.py
+    │   └── migrations/
+    │
+    ├── schemas/
+    ├── repository/
+    ├── services/
+    │
+    └── main.py
+
+Phase 3
+
+✅ Authentication
+✅ JWT
+✅ Refresh token
+✅ RBAC
+
+Phase 4
+
+✅ User Module
+✅ Department Module
+✅ Project Module
+
+Phase 5
+
+✅ Task Module
+✅ Approval Module
+✅ File Upload
+
+Phase 6
+
+✅ Redis
+✅ Cache
+✅ Rate Limiting
+
+Phase 7
+
+✅ Reports
+✅ Dashboard
+✅ Background Jobs
+
+Phase 8
+
+✅ Testing
+✅ Docker
+✅ Deployment
