@@ -36,6 +36,7 @@ pip freeze > requirements.txt
 - DATABASE_URL=postgresql+asyncpg://postgres:YOUR_POSTGRES_PASSWORD@localhost:5432/workflow_db
 - pip install sqlalchemy asyncpg alembic
 - app/models/user.py
+- app/models/project.py
 - check all version:
     - pip show sqlalchemy
     - pip show asyncpg
@@ -54,6 +55,30 @@ pip freeze > requirements.txt
 
 - run : alembic init app/db/migrations
 - alembic.ini
+
+- first migration of User and Project: alembic revision --autogenerate -m "create users and projects tables"
+- after migration done: alembic upgrade head
+
+- app/core/dependency.py
+
+# Authentication
+- Password hashing
+    - pip install "pwdlib[argon2]"
+    - app/core/security.py
+- schema/auth.py
+- repository/auth.py
+- service/auth.py
+- routes/auth.py
+
+- JWT package install : pip install PyJWTc
+- app/core/security.py
+- app/core/dependency: get_current_user
+- app/service: refresh_token: process
+- RBAC: add new field in user model for role
+- alembic revision --autogenerate -m "add role column to user table"
+- alembic upgrade head :  this commond will run after every migration run
+- work on role checking : app/core/dependency: require_role
+- create model for porject : app/schema/project.py
 
 
 

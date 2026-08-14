@@ -21,6 +21,12 @@ class User(Base):
         nullable=False
     )
 
+    role: Mapped[str] = mapped_column(
+        String(50),
+        default="user",
+        nullable=False
+    )
+
     email: Mapped[str]= mapped_column(
         String(225),
         index=True,

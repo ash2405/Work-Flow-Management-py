@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import (
 
 from app.core.config import settings
 
-# engine : database communication manager
+# engine database communication manager
 engine = create_async_engine(
     settings.DATABASE_URL,
     echo=settings.DEBUG,
@@ -19,11 +19,3 @@ AsyncSessionLocal = async_sessionmaker(
     class_ = AsyncSession,
     expire_on_commit=False
 )
-
-async def get_db() -> AsyncGenerator[AsyncSession, None]:
-    """
-    Provide a database session for each request.
-    """
-
-    async with AsyncSessionLocal() as session:
-        yield session

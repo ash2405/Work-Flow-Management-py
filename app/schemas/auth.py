@@ -1,0 +1,29 @@
+from pydantic import BaseModel
+
+class Auth():
+
+    class UserBase(BaseModel):
+        email: str
+        username: str
+
+    class SignupRequest(UserBase):
+        password: str
+
+    class LoginRequest(BaseModel):
+        email: str
+        password: str
+
+    class TokenResponse(BaseModel):
+        access_token: str
+        token_type: str = "bearer"
+
+    class RefreshToken(TokenResponse):
+        refresh_token: str
+
+    class AuthResponse(BaseModel):
+        message: str
+        user: RefreshToken
+
+    class RefreshToken(BaseModel):
+        refresh_token:str
+

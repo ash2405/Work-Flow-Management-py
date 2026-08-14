@@ -6,7 +6,7 @@ from app.core.config import settings
 from app.core.logger import logger
 from app.core.lifespan import lifespan
 
-from app.api.healthcheck import router as health_check_router
+from app.routes import api_router
 
 def create_app():
     app = FastAPI(
@@ -19,7 +19,7 @@ def create_app():
     openapi_url="/openapi.json",
     )
 
-    app.include_router(health_check_router)
+    app.include_router(api_router)
     
     return app
 
