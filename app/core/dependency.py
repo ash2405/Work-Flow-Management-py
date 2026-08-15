@@ -11,7 +11,7 @@ from app.repository.auth import get_user_by_id
 
 # Get token from header authentication
 outh2_password = OAuth2PasswordBearer(
-    tokenUrl='/auth/login'
+    tokenUrl="/auth/token"
 )
 
 # For creating the session for every request and after completing it the session will close
@@ -34,9 +34,9 @@ async def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token"
         )
-
+    
     # get user from table with user id
-    user = get_user_by_id(user_id)
+    user = await get_user_by_id(db,int(user_id))
 
 
     if not user:

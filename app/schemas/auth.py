@@ -24,6 +24,5 @@ class Auth():
         message: str
         user: RefreshToken
 
-    class RefreshToken(BaseModel):
-        refresh_token:str
+
 

@@ -12,19 +12,22 @@ async def singup(
 )->User:
 
    # check user email first to create for unqiue email
-   exsisting_user =  await get_user_by_email(db,data)
+   exsisting_user =  await get_user_by_email(db,data.email)
+
 
     # check for unique email check
-   if exsisting_user in None:
-     return None
+   if exsisting_user is not None:
+      raise HTTPException(
+                      status_code=400,
+                      detail="Email is already exist."
+                   )
    # convert password into hash password
    pasword_hash = hash_password(data.password)
-
     # create new object with hash password
    user_data_dict  = User(
-      name=data.name,
+      name=data.username,
       email=data.email,
-      passwor=pasword_hash
+      password_hash=pasword_hash
    )
 
    return await create_user(db,user_data_dict )
@@ -32,17 +35,17 @@ async def singup(
 async def login_request(db:AsyncSession,
                         data:Auth.LoginRequest):
    # get user detail
-   is_exsist = await get_user_by_email(db,data)
+   is_exsist = await get_user_by_email(db,data.email)
 
    # check user exsist
    if is_exsist is None:
-      None
+      return None
 
    # check password with hased password
    password_verified = verify_password(data.password, is_exsist.password_hash)
 
    if not password_verified:
-      None
+      return None
 
    # generate access token
    access_token = create_access_token(

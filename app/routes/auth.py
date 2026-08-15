@@ -1,5 +1,6 @@
 
 from fastapi import APIRouter, status, Depends, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.auth import Auth
@@ -19,15 +20,10 @@ async def signup_user(
 ):
     user = await singup(db,data)
 
-    if user is None:
-         raise HTTPException(
-                 status_code=400,
-                 detail="Email is already exist."
-              )
     return {"message": "User registered successfully.", "user": user}
 
 
-@router.post('/signin',
+@router.post('/login',
              status_code=status.HTTP_200_OK,
              response_model=Auth.AuthResponse)
 async def login_user(
@@ -39,7 +35,7 @@ async def login_user(
     if user is None:
         raise HTTPException(
                  status_code=401,
-                 detail="Password is not matched."
+                 detail="Invalid Email and Password."
               )
 
     return Auth.AuthResponse(
@@ -61,5 +57,29 @@ async def refresh_token(data:Auth.RefreshToken):
     )
 
 
+@router.post("/token")
+async def token(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: AsyncSession = Depends(get_db),
+):
+    # Swagger's "username" field contains the user's email
+    data = Auth.LoginRequest(
+        email=form_data.username,
+        password=form_data.password,
+    )
 
-    
+    token_data = await login_request(
+        db=db,
+        data=data,
+    )
+
+    if token_data is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid Email and Password",
+        )
+
+    return {
+        "access_token": token_data["access_token"],
+        "token_type": "bearer",
+    }
