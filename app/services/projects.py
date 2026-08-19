@@ -1,12 +1,11 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException, status
 
-from app.schemas.projects import ProjectCreate
-from app.db.models import Project
+from app.schemas.projects import ProjectCreate, ProjectSortField, ProjectUpdate, SortOrder
+from app.db.models import Project, User
 from app.repository.project import( 
 create_project, 
 get_all_project, 
-get_project_by_user, 
 get_project_detail_by_id,
 update_project_detail,
 delete_project
@@ -29,17 +28,28 @@ async def create_project_service(
     )
 
 # get project list
-async def get_user_project_list_service(
+async def get_project_list_service(
         db:AsyncSession,
-        user_id:int
-): return await get_project_by_user(
-        db,user_id
-    )
-
-# get all project list
-async def get_all_project_list_service(
-        db:AsyncSession
-): return await get_all_project(db)
+        current_user:User,        
+        limit:int = 10,
+        page:int = 1,
+        search:str|None = None,
+        sort_order: SortOrder = SortOrder.desc ,
+        sort_by : ProjectSortField = ProjectSortField.created_at,
+): 
+       projects , total = await get_all_project(
+               db,
+               current_user=current_user,
+               limit=limit,
+               page=page,
+               search=search,
+               sort_order=sort_order,
+               sort_by=sort_by
+            ) 
+       return {
+           "projects":projects,
+           "total":total
+       }
 
 # get project detail
 async def get_project_detail_service(
@@ -57,11 +67,13 @@ async def get_project_detail_service(
 
 # update project detail
 async def update_project_detail_service(
-      data: Project,
+      data: ProjectUpdate,
       project_id :int,
-      db:AsyncSession
+      db:AsyncSession,
+      user:User
 ):
    project_item =  await get_project_detail_by_id(db,project_id)
+
 
    if project_item is None:
       raise HTTPException(
@@ -69,12 +81,19 @@ async def update_project_detail_service(
          detail="Project not found"
       )
    
+   if project_item.owner_id != user.id and user.role != 'admin':
+      raise HTTPException(
+         status_code=status.HTTP_403_FORBIDDEN,
+         detail="Only Project owner can update"
+      )
+   
    return await update_project_detail(db,project_item,data)
 
 # delete project 
 async def delete_project_service(
     db: AsyncSession,
-    project_id: int):
+    project_id: int,
+    user:User):
 
     project = await get_project_detail_by_id(
         db,
@@ -85,6 +104,12 @@ async def delete_project_service(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Project not found.",
+        )
+    
+    if project.owner_id != user.id and user.role != 'admin':
+        raise HTTPException(
+           status_code=status.HTTP_403_FORBIDDEN,
+           detail="Only Project owner or admin can delete"
         )
 
     await delete_project(

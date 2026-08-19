@@ -78,11 +78,45 @@ pip freeze > requirements.txt
 - alembic revision --autogenerate -m "add role column to user table"
 - alembic upgrade head :  this commond will run after every migration run
 - work on role checking : app/core/dependency: require_role
-- create model for porject : app/schema/project.py
+
+# Query and table
+- start work on user end points
+- start work on project end points
+- start work on department 
+    - Model : realeation with user
+    - route , service , repository, schema
 
 
 
 
+
+
+
+
+
+# Task Completions
+    - User signup/login
+    - Password hashing + verification
+    - JWT access token
+    - JWT refresh token
+    - Access/refresh token type validation
+    - Swagger Bearer authentication
+    - get_current_user()
+    - Role-based access — admin/user
+    - User update
+    - User delete
+    - User activate/deactivate
+    - Project create
+    - Project list
+    - Project detail
+    - Project update
+    - Project delete
+    - Project ownership authorization
+    - Admin can manage other users' projects
+    - User delete ke time projects transfer/delete
+    - Transaction + rollback handling
+    - Pydantic request/response schemas
+    - SQLAlchemy model/schema separation
 
 
 

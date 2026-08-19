@@ -45,17 +45,7 @@ async def login_user(
 
 @router.post('/refresh',response_model=Auth.TokenResponse)
 async def refresh_token(data:Auth.RefreshToken):
-    user_token = await refresh_access_token(data.refresh_token)
-    if user_token is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invaild Resfresh Token"
-        )
-    return Auth.TokenResponse(
-        access_token=user_token,
-        token_type="bearer"
-    )
-
+    return await refresh_access_token(data.refresh_token)
 
 @router.post("/token")
 async def token(

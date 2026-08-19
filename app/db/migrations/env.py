@@ -10,8 +10,7 @@ from app.db.base import Base
 
 # Import all models so SQLAlchemy registers them
 # in Base.metadata.
-from app.db.models.user import User
-from app.db.models.project import Project
+from app.db.models import __all__
 
 
 config = context.config

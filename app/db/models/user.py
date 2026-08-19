@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Mapped, mapped_column , relationship
-from sqlalchemy import String, DateTime, Boolean
+from sqlalchemy import String, DateTime, Boolean, ForeignKey
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
@@ -7,6 +7,7 @@ from app.db.base import Base
 
 if TYPE_CHECKING:
     from app.db.models.project import Project
+    from app.db.models.department import Department
 
 class User(Base):
     __tablename__ = 'users'
@@ -14,6 +15,11 @@ class User(Base):
     id: Mapped[int] = mapped_column(
         primary_key=True,
         autoincrement=True
+    )
+
+    department_id : Mapped[ int | None] = mapped_column(
+        ForeignKey('departments.id'),
+        nullable=True
     )
 
     name: Mapped[str] = mapped_column(
@@ -39,7 +45,7 @@ class User(Base):
         nullable=False
     )
 
-    is_active: Mapped[Boolean] = mapped_column(
+    is_active: Mapped[bool] = mapped_column(
         Boolean,
         default=True,
         nullable=False
@@ -49,7 +55,7 @@ class User(Base):
         back_populates="owner"
     )
 
-    created_at: Mapped[DateTime] = mapped_column(
+    created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=datetime.now(timezone.utc),
         nullable=False
@@ -60,4 +66,8 @@ class User(Base):
         default=datetime.now(timezone.utc),
         onupdate=datetime.now(timezone.utc),
         nullable=False,
+    )
+
+    department: Mapped["Department | None"] = relationship(
+            back_populates="users"
     )

@@ -8,6 +8,7 @@ class Auth():
 
     class SignupRequest(UserBase):
         password: str
+        department_id:int
 
     class LoginRequest(BaseModel):
         email: str

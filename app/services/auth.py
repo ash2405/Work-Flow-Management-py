@@ -1,4 +1,4 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import hash_password, verify_password , create_access_token , create_refresh_token , decode_refresh_token
@@ -27,7 +27,8 @@ async def singup(
    user_data_dict  = User(
       name=data.username,
       email=data.email,
-      password_hash=pasword_hash
+      password_hash=pasword_hash,
+      department_id = data.department_id
    )
 
    return await create_user(db,user_data_dict )
@@ -72,7 +73,20 @@ def refresh_access_token(
    user_id = payload.get('sub') 
 
    if not user_id:
-      None
+      raise HTTPException(
+                 status_code=status.HTTP_401_UNAUTHORIZED,
+                 detail="Invaild Resfresh Token"
+             )
 
-   return create_access_token(user_id)
+   # generate refresh token
+   refresh_token  = create_refresh_token(
+         user_id=user_id
+      )
+   user_token = create_access_token(user_id)
+   
+   return Auth.RefreshToken(
+           access_token=user_token,
+           refresh_token=refresh_token,
+           token_type="bearer"
+       )
 

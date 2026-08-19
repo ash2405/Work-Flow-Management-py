@@ -29,9 +29,10 @@ async def get_current_user(
     # get user id from jwt token object
     user_id = payload.get('sub')
 
+
     if not user_id:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail="Invalid token"
         )
     
@@ -44,6 +45,12 @@ async def get_current_user(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found"
         )
+
+    if  not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Inactive User can't call the function",
+        )
     
     return user
 
@@ -52,13 +59,10 @@ def require_role(*required_role:str):
     async def role_checker(
             current_user:User = Depends(get_current_user)
     )->User:
-
         if current_user.role not in required_role:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="You don't have permission to access this resource"
             )
-
         return current_user
-
     return role_checker
