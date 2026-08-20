@@ -13,7 +13,8 @@ async def get_user_by_id(
     user = await db.execute(
         select(User)
         .options(
-            selectinload(User.projects)
+            selectinload(User.projects),
+            selectinload(User.department)
 
         )
         .where(User.id == user_id)

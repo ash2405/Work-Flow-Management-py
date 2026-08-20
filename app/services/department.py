@@ -53,25 +53,71 @@ async def department_list(db:AsyncSession):
 
 # update department item
 async def update_department(
-        db:AsyncSession,
-        data:DepartmentRequest,
-        department_id:int
+    db: AsyncSession,
+    data: DepartmentRequest,
+    department_id: int,
 ):
-    # get user item
-    department_item = await department_get_by_name_or_id(db=db,department_id=department_id)
+    # Normalize incoming department name
+    department_name = data.name.strip().lower()
 
-    if department_item.name == data.name:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Same name can't be update"
-        )
+    # Get department that needs to be updated
+    department_item = await department_get_by_name_or_id(
+        db=db,
+        department_id=department_id,
+    )
 
+    # Department does not exist
     if department_item is None:
         raise HTTPException(
-            status_code= status.HTTP_404_NOT_FOUND,
-            detail= "Department is not found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Department not found",
         )
-    return await update_department_item(db=db,data=data, department=department_item)
+
+    # Check whether another department already has this name
+    department_item_by_name = await department_get_by_name_or_id(
+        db=db,
+        department_name=department_name,
+    )
+
+    # Another department already uses this name
+    if (
+        department_item_by_name is not None
+        and department_item_by_name.id != department_item.id
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Department name already exists",
+        )
+
+    # Nothing actually changed
+    if department_item.name.strip().lower() == department_name:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Department name is already the same",
+        )
+
+    try:
+        # Update department
+        department = await update_department_item(
+            db=db,
+            data=data,
+            department=department_item,
+        )
+
+        # Save changes permanently
+        await db.commit()
+
+        # Reload updated department from database
+        await db.refresh(department)
+
+        return department
+
+    except Exception:
+        # Undo all pending database changes if anything fails
+        await db.rollback()
+
+        # Re-raise original exception
+        raise
 
 # delete department
 async def delete_department_item(

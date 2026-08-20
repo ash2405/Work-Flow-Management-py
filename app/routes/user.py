@@ -12,8 +12,9 @@ from app.services.user import (
 from app.schemas.user import (  UserListResponse,
                                 UserDetail,
                                 DeleteUserRequest,
-                                UserDetailResponse,
-                                UserStatusUpdate)
+                                UserUpdateDetailResponse,
+                                UserStatusUpdate,
+                                UserDetailResponse)
 from app.db.models import User
 
 router = APIRouter(
@@ -21,7 +22,7 @@ router = APIRouter(
     tags=['User']
 )
 
-@router.get('/{user_id}', response_model= UserListResponse)
+@router.get('/{user_id}', response_model= UserDetailResponse)
 async def get_user_by_id(
     user_id:int,
     db: AsyncSession= Depends(get_db),
@@ -29,7 +30,7 @@ async def get_user_by_id(
 ):
 
     user = await get_user_by_id_service(db=db,user_id=user_id)
-
+    print('----user',user.department)
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -45,7 +46,7 @@ async def get_users(
     return await get_all_user_service(db)
 
 # update user
-@router.patch('/{user_id}',response_model=UserDetailResponse)
+@router.patch('/{user_id}',response_model=UserUpdateDetailResponse)
 async def update_user(
     user_id:int,
     data:UserDetail,

@@ -1,7 +1,7 @@
 from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime
 
-from app.schemas.user import UserDetailResponse
+from app.schemas.user import UserUpdateDetailResponse
 
 class DepartmentRequest(BaseModel):
     name : str = Field(
@@ -21,5 +21,6 @@ class DepartmentResponse(DepartmentRequest):
 class DepartmentDetailResponse(DepartmentRequest):
     id : int
     created_at : datetime
-    users:list[UserDetailResponse]
+    users:list[UserUpdateDetailResponse]
     model_config = ConfigDict(from_attributes=True)
+    

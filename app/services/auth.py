@@ -1,10 +1,15 @@
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.security import hash_password, verify_password , create_access_token , create_refresh_token , decode_refresh_token
+from app.core.security import (hash_password,
+                               verify_password ,
+                               create_access_token ,
+                               create_refresh_token ,
+                               decode_refresh_token)
 from app.schemas.auth import Auth
 from app.repository.auth import get_user_by_email, create_user
 from app.db.models import User
+from app.repository.department import department_get_by_name_or_id
 
 async def singup(
         db:AsyncSession,
@@ -21,17 +26,42 @@ async def singup(
                       status_code=400,
                       detail="Email is already exist."
                    )
-   # convert password into hash password
-   pasword_hash = hash_password(data.password)
-    # create new object with hash password
-   user_data_dict  = User(
-      name=data.username,
-      email=data.email,
-      password_hash=pasword_hash,
-      department_id = data.department_id
-   )
 
-   return await create_user(db,user_data_dict )
+   # check department exist or not
+   if data.department_id in None:
+      raise HTTPException(
+         status_code=status.HTTP_400_BAD_REQUEST,
+         detail="department id is required"
+      )
+   
+   department = await department_get_by_name_or_id(db=db, department_id=data.department_id)
+
+   if department is None:
+      raise HTTPException(
+         status_code=status.HTTP_404_NOT_FOUND,
+         detail="Selected department is not found"
+      )
+   try:
+
+      # convert password into hash password
+      pasword_hash = hash_password(data.password)
+       # create new object with hash password
+      user_data_dict  = User(
+         name=data.username,
+         email=data.email,
+         password_hash=pasword_hash,
+         department_id = data.department_id
+      )
+
+      user = await create_user(db,user_data_dict )
+      await db.commit()
+      await db.refresh(user)
+      
+      return user
+   
+   except Exception:
+        await db.rollback()
+        raise
 
 async def login_request(db:AsyncSession,
                         data:Auth.LoginRequest):

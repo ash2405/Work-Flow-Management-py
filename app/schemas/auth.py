@@ -13,6 +13,7 @@ class Auth():
     class LoginRequest(BaseModel):
         email: str
         password: str
+        department_id : int | None = None
 
     class TokenResponse(BaseModel):
         access_token: str
