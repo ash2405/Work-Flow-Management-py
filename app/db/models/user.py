@@ -71,3 +71,13 @@ class User(Base):
     department: Mapped["Department | None"] = relationship(
             back_populates="users"
     )
+
+    assigned_tasks : Mapped[list['Task']]= relationship(
+        foreign_keys="Task.assign_to",
+        back_populates="assignee"
+    )
+
+    created_tasks : Mapped[list["Task"]] = relationship(
+        foreign_keys="Task.created_by",
+        back_populates="creator"
+    )

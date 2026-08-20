@@ -9,6 +9,7 @@ from app.db.base import Base
 
 if TYPE_CHECKING:
     from app.db.models.user import User
+    from app.db.models.task import Task
 
 class Project (Base):
     __tablename__ = 'projects'
@@ -43,3 +44,7 @@ class Project (Base):
     owner: Mapped["User"] = relationship(
         back_populates="projects",
     )
+
+    tasks : Mapped[list["Task"]] = relationship(
+            back_populates='project'
+        )

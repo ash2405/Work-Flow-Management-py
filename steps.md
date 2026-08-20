@@ -85,6 +85,7 @@ pip freeze > requirements.txt
 - start work on department 
     - Model : realeation with user
     - route , service , repository, schema
+- start work on task 
 
 
 
